@@ -1,0 +1,88 @@
+import numpy as np
+from kivy.app import App
+from kivy.uix.widget import Widget
+from kivy.graphics import Color, Ellipse
+from kivy.clock import Clock
+
+def create_matrices():
+    """
+    Create the matrices for teleportation detection with added noise.
+    """
+    matrix1 = np.array([[0, 1], [-1, 0]])
+    matrix2 = np.array([[0, 0], [0, 0]])
+    noise = np.random.normal(0, 0.1, matrix1.shape)  # Adding Gaussian noise
+    matrix1 += noise
+    matrix2 += noise
+    return matrix1, matrix2
+
+def teleportation_detection(matrix1, matrix2):
+    """
+    Perform teleportation detection using matrix operations.
+    """
+    result_matrix = np.dot(matrix1, matrix2)
+    return result_matrix
+
+class MovingObject:
+    def __init__(self, x, y, size, dx, dy):
+        self.x = x
+        self.y = y
+        self.size = size
+        self.dx = dx
+        self.dy = dy
+
+    def move(self, width, height):
+        self.x += self.dx
+        self.y += self.dy
+        if self.x < 0 or self.x + self.size > width:
+            self.dx = -self.dx
+        if self.y < 0 or self.y + self.size > height:
+            self.dy = -self.dy
+
+class RadarWidget(Widget):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.objects = []
+        Clock.schedule_interval(self.update, 1/60)
+        self.detect_objects()
+
+    def detect_objects(self):
+        """
+        Detect objects based on teleportation detection with noise and add them to the radar.
+        """
+        matrix1, matrix2 = create_matrices()
+        result_matrix = teleportation_detection(matrix1, matrix2)
+        # Simulate object detection based on the result matrix
+        for _ in range(result_matrix.shape[0] * 5):  # Increase the number of objects
+            x = np.random.randint(0, self.width)
+            y = np.random.randint(0, self.height)
+            size = np.random.randint(10, 50)  # Random size for demonstration
+            dx = np.random.uniform(-1, 1)  # Random horizontal speed
+            dy = np.random.uniform(-1, 1)  # Random vertical speed
+            self.objects.append(MovingObject(x, y, size, dx, dy))
+
+    def add_object(self, obj):
+        """
+        Add an object to the radar at the specified coordinates with the given size.
+        """
+        with self.canvas:
+            Color(1, 0, 0)  # Red color for detected objects
+            self.objects.append(Ellipse(pos=(obj.x, obj.y), size=(obj.size, obj.size)))
+
+    def update(self, dt):
+        """
+        Update the radar display.
+        """
+        self.canvas.clear()
+        for obj in self.objects:
+            obj.move(self.width, self.height)
+            with self.canvas:
+                Color(1, 0, 0)
+                self.canvas.add(Ellipse(pos=(obj.x, obj.y), size=(obj.size, obj.size)))
+
+class RadarApp(App):
+    def build(self):
+        radar = RadarWidget()
+        return radar
+
+if __name__ == '__main__':
+    RadarApp().run()
