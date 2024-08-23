@@ -1,0 +1,39 @@
+import time
+import threading
+import psutil
+
+def create_matrices():
+    # Your existing matrix creation code
+    pass
+
+def matrix_multiplication(matrix1, matrix2):
+    # Your existing matrix multiplication code
+    pass
+
+def detect_objects():
+    # Your existing object detection code
+    pass
+
+def monitor_cpu_utilization(interval=1):
+    while True:
+        cpu_usage = psutil.cpu_percent(interval=1)
+        print(f"CPU Utilization: {cpu_usage}%")
+        time.sleep(interval)
+
+def generate_signal_with_quartz(data):
+    # Simulate signal generation using quartz crystal properties
+    signal = [d * 0.1 for d in data]  # Example transformation
+    return signal
+
+def main():
+    cpu_thread = threading.Thread(target=monitor_cpu_utilization, args=(1,))
+    cpu_thread.start()
+
+    objects = detect_objects()
+    for obj in objects:
+        print(f"Object detected at ({obj[0]}, {obj[1]}) with size {obj[2]}")
+        signal = generate_signal_with_quartz([obj[0], obj[1], obj[2]])
+        print(f"Generated signal: {signal}")
+
+if __name__ == '__main__':
+    main()
